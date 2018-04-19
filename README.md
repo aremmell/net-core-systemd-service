@@ -49,5 +49,5 @@ Make sure that nginx, systemd (in the `.service` file), your .NET Core server, t
 ## Further reading
 I would highly recommend reading the [systemd service documentation](https://www.freedesktop.org/software/systemd/man/systemd.service.html) to fully understand what each entry in the `.service` file means and what different values are possible.
 
-## Errata
+## More coming later
 When I have some time, I will update this repository and README.md with further information and tips about how to fully implement this setup. I have also created some other tools and scripts that automate the process of building, uploading, and hot-swapping .NET Core server versions. You're gonna want those, but hopefully this saves you some time!
