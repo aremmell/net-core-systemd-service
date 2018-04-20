@@ -1,6 +1,21 @@
 # net-core-systemd-service
 A [systemd service](https://www.freedesktop.org/software/systemd/man/systemd.service.html) file template useful for .NET Core web servers behind an nginx reverse proxy.
 
+Table of Contents
+=================
+  * [Requirements and Dependencies:](#requirements-and-dependencies)
+     * [1. nginx as a reverse proxy server](#1-nginx-as-a-reverse-proxy-server)
+     * [2. Notify systemd upon successful initialization](#2-notify-systemd-upon-successful-initialization)
+     * [3. curl](#3-curl)
+     * [4. Kestrel](#4-kestrel)
+     * [5. PID file](#5-pid-file)
+     * [6. Permissions](#6-permissions)
+  * [The syntax-highlighted version](#the-syntax-highlighted-version)
+  * [Further reading](#further-reading)
+  * [More coming later](#more-coming-later)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 ## Requirements and Dependencies:
 
 ### 1. nginx as a reverse proxy server
@@ -60,6 +75,36 @@ try {
 
 ### 6. Permissions
 Make sure that nginx, systemd (in the `.service` file), your .NET Core server, the location of the PID file, and the directory the server binary resides in are all executed and owned by the same user/group combination in the pursuit of security and uniformity. They'll also need execute privileges on the server binary and any other scripts you have as part of your implementation.
+
+## The syntax-highlighted version
+
+```ini
+[Unit]
+Description=MyCompany Web Server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+Wants=nginx.service
+
+[Service]
+Type=notify
+WorkingDirectory=/path/to/netcore/server
+Environment=ASPNETCORE_ENVIRONMENT=production HOME=/home/www-data USER=www-data
+User=www-data
+Group=www-users
+ExecStartPre=/bin/rm -f /path/to/netcore/server/kestrel.sock
+ExecStart=/path/to/netcore/server/MyCompanyServer
+ExecStartPost=/usr/bin/curl -s -XGET --unix-socket /path/to/netcore/server/kestrel.sock http://images
+ExecStopPost=/bin/rm -f /var/run/netcore/netcore.pid
+PIDFile=/var/run/netcore/netcore.pid
+KillMode=process
+KillSignal=SIGINT
+Restart=on-abnormal
+TimeoutSec=40
+SuccessExitStatus=0 SIGINT SIGTERM
+RestartPreventExitStatus=5
+
+[Install]
+WantedBy=multi-user.target
+```
 
 ## Further reading
 I would highly recommend reading the [systemd service documentation](https://www.freedesktop.org/software/systemd/man/systemd.service.html) to fully understand what each entry in the `.service` file means and what different values are possible.
