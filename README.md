@@ -37,11 +37,13 @@ In addition to the `sd_notify` call, systemd will use [curl](https://curl.haxx.s
 1. The .NET Core server gets warmed up by the GET request
 2. If the command fails, systemd knows that something is wrong and your server initialized, but isn't working properly.
 
+    > Note: The `http://images` bit at the end of the curl command is required to avoid a 'malformed url' error (they may have fixed that since I tried).
+
 ### 4. Kestrel
 This template assumes that you're using Kestrel, and that your server listens on the [Unix domain socket](https://en.wikipedia.org/wiki/Unix_domain_socket) named `kestrel.sock`.
 
 ### 5. PID file
-In order for systemd to know which process is your active server, you need to write the current [PID](https://en.wikipedia.org/wiki/Process_identifier) of the server process to the same file referenced in the `.service` file upon startup.
+In order for systemd to know which process is your active server, you need to write the current [PID](https://en.wikipedia.org/wiki/Process_identifier) of the server process to the same file referenced in the `.service` file upon startup. You can obtain the PID of your process like this: `var pid = Process.GetCurrentProcess().id;`
 
 ### 6. Permissions
 Make sure that nginx, systemd (in the `.service` file), your .NET Core server, the location of the PID file, and the directory the server binary resides in are all executed and owned by the same user/group combination in the pursuit of security and uniformity. They'll also need execute privileges on the server binary and any other scripts you have as part of your implementation.
