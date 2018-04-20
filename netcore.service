@@ -1,0 +1,25 @@
+[Unit]
+Description=MyCompany Web Server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+Wants=nginx.service
+
+[Service]
+Type=notify
+WorkingDirectory=/path/to/netcore/server
+Environment=ASPNETCORE_ENVIRONMENT=production HOME=/home/www-data USER=www-data
+User=www-data
+Group=www-users
+ExecStartPre=/bin/rm -f /path/to/netcore/server/kestrel.sock
+ExecStart=/path/to/netcore/server/MyCompanyServer
+ExecStartPost=/usr/bin/curl -s -XGET --unix-socket /path/to/netcore/server/kestrel.sock http://images
+ExecStopPost=/bin/rm -f /var/run/netcore/netcore.pid
+PIDFile=/var/run/netcore/netcore.pid
+KillMode=process
+KillSignal=SIGINT
+Restart=on-abnormal
+TimeoutSec=40
+SuccessExitStatus=0 SIGINT SIGTERM
+RestartPreventExitStatus=5
+
+[Install]
+WantedBy=multi-user.target
