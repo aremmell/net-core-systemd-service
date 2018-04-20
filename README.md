@@ -43,7 +43,20 @@ In addition to the `sd_notify` call, systemd will use [curl](https://curl.haxx.s
 This template assumes that you're using Kestrel, and that your server listens on the [Unix domain socket](https://en.wikipedia.org/wiki/Unix_domain_socket) named `kestrel.sock`.
 
 ### 5. PID file
-In order for systemd to know which process is your active server, you need to write the current [PID](https://en.wikipedia.org/wiki/Process_identifier) of the server process to the same file referenced in the `.service` file upon startup. You can obtain the PID of your process like this: `var pid = Process.GetCurrentProcess().id;`
+In order for systemd to know which process is your active server, you need to write the current [PID](https://en.wikipedia.org/wiki/Process_identifier) of the server process to the same file referenced in the `.service` file upon startup. Here's a sample of how to do that:
+
+```C#
+try {
+    var pid = Process.GetCurrentProcess().id;
+    
+    using (var pidFile = File.CreateText(pidFilePath)) {
+        pidFile.Write(pid);
+        pidFile.WriteLine();
+    }
+} catch(Exception ex) {
+    // do something because we're really boned.
+}
+```
 
 ### 6. Permissions
 Make sure that nginx, systemd (in the `.service` file), your .NET Core server, the location of the PID file, and the directory the server binary resides in are all executed and owned by the same user/group combination in the pursuit of security and uniformity. They'll also need execute privileges on the server binary and any other scripts you have as part of your implementation.
