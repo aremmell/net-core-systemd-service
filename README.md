@@ -51,7 +51,9 @@ In addition to the `sd_notify` call, systemd will use [curl](https://curl.haxx.s
 1. The .NET Core server gets warmed up by the GET request
 2. If the command fails, systemd knows that something is wrong and your server initialized, but isn't working properly.
 
-    > Note: The `http://images` bit at the end of the curl command is required to avoid a 'malformed url' error (they may have fixed that since I tried).
+    > Notes: The `http://images` bit at the end of the curl command is required to avoid a 'malformed url' error (they may have fixed that since I tried).
+    
+    > If you use Application Insights like me for your server, you may want to add a header to the curl command (e.g. `-H "X-Warming-Up: true"` that you've set your server up to recognize as being warmed up, causing AI to be bypassed so that statistics about load time are not polluted.
 
 ### 4. Kestrel
 This template assumes that you're using Kestrel, and that your server listens on the [Unix domain socket](https://en.wikipedia.org/wiki/Unix_domain_socket) named `kestrel.sock`.
