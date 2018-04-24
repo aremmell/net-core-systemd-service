@@ -76,36 +76,6 @@ try {
 ### 6. Permissions
 Make sure that nginx, systemd (in the `.service` file), your .NET Core server, the location of the PID file, and the directory the server binary resides in are all executed and owned by the same user/group combination in the pursuit of security and uniformity. They'll also need execute privileges on the server binary and any other scripts you have as part of your implementation.
 
-## The syntax-highlighted version
-
-```ini
-[Unit]
-Description=MyCompany Web Server
-After=syslog.target network.target remote-fs.target nss-lookup.target
-Wants=nginx.service
-
-[Service]
-Type=notify
-WorkingDirectory=/path/to/netcore/server
-Environment=ASPNETCORE_ENVIRONMENT=production HOME=/home/www-data USER=www-data
-User=www-data
-Group=www-users
-ExecStartPre=/bin/rm -f /path/to/netcore/server/kestrel.sock
-ExecStart=/path/to/netcore/server/MyCompanyServer
-ExecStartPost=/usr/bin/curl -s -XGET --unix-socket /path/to/netcore/server/kestrel.sock http://images
-ExecStopPost=/bin/rm -f /var/run/netcore/netcore.pid
-PIDFile=/var/run/netcore/netcore.pid
-KillMode=process
-KillSignal=SIGINT
-Restart=on-abnormal
-TimeoutSec=40
-SuccessExitStatus=0 SIGINT SIGTERM
-RestartPreventExitStatus=5
-
-[Install]
-WantedBy=multi-user.target
-```
-
 ## Further reading
 I would highly recommend reading the [systemd service documentation](https://www.freedesktop.org/software/systemd/man/systemd.service.html) to fully understand what each entry in the `.service` file means and what different values are possible.
 
