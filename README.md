@@ -10,7 +10,6 @@ Table of Contents
      * [4. Kestrel](#4-kestrel)
      * [5. PID file](#5-pid-file)
      * [6. Permissions](#6-permissions)
-  * [The syntax-highlighted version](#the-syntax-highlighted-version)
   * [Further reading](#further-reading)
   * [More coming later](#more-coming-later)
 
