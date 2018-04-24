@@ -1,23 +1,33 @@
+
+# See systemd.service at:
+# https://www.freedesktop.org/software/systemd/man/systemd.service.html
+
+# If modified, overwrite file in /etc/systemd/system/ and run 'sudo systemctl daemon-reload'
+# Get status with 'sudo systemctl status netcore.service'
+
 [Unit]
 Description=MyCompany Web Server
 After=syslog.target network.target remote-fs.target nss-lookup.target
 Wants=nginx.service
 
 [Service]
+PermissionsStartOnly=true
 Type=notify
 WorkingDirectory=/path/to/netcore/server
 Environment=ASPNETCORE_ENVIRONMENT=production HOME=/home/www-data USER=www-data
 User=www-data
 Group=www-users
+ExecStartPre=/bin/mkdir -p -m 755 /var/run/netcore
+ExecStartPre=/bin/chown -f www-data:www-users /var/run/netcore
 ExecStartPre=/bin/rm -f /path/to/netcore/server/kestrel.sock
 ExecStart=/path/to/netcore/server/MyCompanyServer
-ExecStartPost=/usr/bin/curl -s -XGET --unix-socket /path/to/netcore/server/kestrel.sock http://images
-ExecStopPost=/bin/rm -f /var/run/netcore/netcore.pid
+ExecStartPost=/bin/chown -f www-data:www-users /path/to/netcore/server/kestrel.sock
+ExecStartPost=/usr/bin/curl -so /dev/null -XGET --unix-socket /path/to/netcore/server/kestrel.sock http://images
 PIDFile=/var/run/netcore/netcore.pid
 KillMode=process
 KillSignal=SIGINT
 Restart=on-abnormal
-TimeoutSec=40
+TimeoutSec=60
 SuccessExitStatus=0 SIGINT SIGTERM
 RestartPreventExitStatus=5
 
